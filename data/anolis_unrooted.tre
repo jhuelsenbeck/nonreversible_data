@@ -1,0 +1,5 @@
+#NEXUS 
+
+begin trees;  
+	tree anolis_unrooted = [&U] (Anolis_ahli,(((((((((Anolis_aliniger,Anolis_coelestinus),Anolis_bahorucoensis),(Anolis_equestris,Anolis_luteogularis)),(Anolis_occultus,Diplolaemus_darwinii)),(Anolis_insolitus,Anolis_olssoni)),(Anolis_barahonae,Anolis_cuvieri)),((Anolis_brevirostris,Anolis_distichus),((Anolis_cristatellus,Anolis_krugi),Anolis_stratulus))),(((Anolis_alutaceus,Anolis_vanidicus),((Anolis_angusticeps,Anolis_paternus),Anolis_loysiana)),(Anolis_marcanoi,Anolis_strahmi))),(Anolis_ophiolepis,Anolis_sagrei)),(((Anolis_garmani,Anolis_grahami),Anolis_valencienni),Anolis_lineatopus));
+end;
