@@ -1,5 +1,6 @@
-#NEXUS 
+#NEXUS
 
-begin trees; 
-	tree anolis_rooted = [&R] (((((((((Anolis_ahli,(((Anolis_garmani,Anolis_grahami),Anolis_valencienni),Anolis_lineatopus)),(Anolis_ophiolepis,Anolis_sagrei)),(((Anolis_alutaceus,Anolis_vanidicus),((Anolis_angusticeps,Anolis_paternus),Anolis_loysiana)),(Anolis_marcanoi,Anolis_strahmi))),((Anolis_brevirostris,Anolis_distichus),((Anolis_cristatellus,Anolis_krugi),Anolis_stratulus))),(Anolis_barahonae,Anolis_cuvieri)),(Anolis_insolitus,Anolis_olssoni)),(((Anolis_aliniger,Anolis_coelestinus),Anolis_bahorucoensis),(Anolis_equestris,Anolis_luteogularis))),Anolis_occultus),Diplolaemus_darwinii);
+begin trees;
+	tree anolis_rooted = [&R]
+	(((((((((Anolis_ahli:0.100000,(((Anolis_garmani:0.100000,Anolis_grahami:0.100000):0.100000,Anolis_valencienni:0.100000):0.100000,Anolis_lineatopus:0.100000):0.100000):0.100000,(Anolis_ophiolepis:0.100000,Anolis_sagrei:0.100000):0.100000):0.100000,(((Anolis_alutaceus:0.100000,Anolis_vanidicus:0.100000):0.100000,((Anolis_angusticeps:0.100000,Anolis_paternus:0.100000):0.100000,Anolis_loysiana:0.100000):0.100000):0.100000,(Anolis_marcanoi:0.100000,Anolis_strahmi:0.100000):0.100000):0.100000):0.100000,((Anolis_brevirostris:0.100000,Anolis_distichus:0.100000):0.100000,((Anolis_cristatellus:0.100000,Anolis_krugi:0.100000):0.100000,Anolis_stratulus:0.100000):0.100000):0.100000):0.100000,(Anolis_barahonae:0.100000,Anolis_cuvieri:0.100000):0.100000):0.100000,(Anolis_insolitus:0.100000,Anolis_olssoni:0.100000):0.100000):0.100000,(((Anolis_aliniger:0.100000,Anolis_coelestinus:0.100000):0.100000,Anolis_bahorucoensis:0.100000):0.100000,(Anolis_equestris:0.100000,Anolis_luteogularis:0.100000):0.100000):0.100000):0.100000,Anolis_occultus:0.100000):0.100000,Diplolaemus_darwinii:0.100000):0.100000;
 end;
