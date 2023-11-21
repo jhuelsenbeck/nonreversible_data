@@ -36,9 +36,11 @@ rooted_tree <- readTrees("data/"+ANALYSIS_NAME+"_rooted.tre", treetype="non-cloc
 outgroup <- clade("Diplolaemus_darwinii")
 
 tree ~ dnUniformTopologyBranchLength( branchLengthDistribution=dnExp(10.0), taxa,
-                                      rooted=TRUE,
+                                      rooted=!TRUE,
                                       outgroup )
 tree.setValue( rooted_tree )
+
+TL := tree.treeLength()
 
 moves.append( mvBranchLengthScale( tree, weight=n_taxa*2-1 ) )
 
@@ -95,7 +97,7 @@ monitors.append( mnFile(filename="output/"+ANALYSIS_NAME+"_GTR.trees", printgen=
 monitors.append( mnScreen(printgen=100, alpha) )
 
 # Initialize the MCMC object #
-mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine="mixed")
+mymcmc = mcmc(mymodel, monitors, moves, nruns=8, combine="mixed")
 
 # Run the MCMC #
 mymcmc.run(generations=50000, tuningInterval=200, underPrior=!TRUE)

@@ -1,0 +1,36 @@
+########################################################
+#
+# RevBayes Example: Non-reversible to reversible substitution model on strict clock tree
+#
+#
+# authors: Sebastian Hoehna & John Huelsenbeck
+#
+########################################################
+
+
+
+
+#######################################
+# GTR+G nucleotide substitution model #
+#######################################
+
+
+pi ~ dnDirichlet( rep(1,4) )
+er ~ dnDirichlet( rep(1,6) )
+
+moves.append( mvDirichletSimplex(pi, alpha=50, weight=1) )
+moves.append( mvDirichletSimplex(er, alpha=50, weight=1) )
+moves.append( mvBetaSimplex(pi, alpha=50, weight=1) )
+moves.append( mvBetaSimplex(er, alpha=50, weight=1) )
+
+# Create the matrix #
+Q_gen := fnGTR(er, pi)
+
+# Create a discretized gamma distribution of rate categories  #
+# the shape parameter is drawn from an uniform prior #
+alpha ~ dnUniform( 0.0, 1E6 )
+alpha.setValue( 1.0 )
+
+moves.append( mvScale(alpha, lambda=0.5,tune=true, weight=2.0) )
+
+rates := fnDiscretizeGamma( alpha, alpha, 4 )

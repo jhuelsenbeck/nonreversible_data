@@ -31,7 +31,7 @@ monitors = VectorMonitors()
 # Fixed topology with exponential branch lengths #
 ##################################################
 
-rooted_tree <- readTrees("data/"+ANALYSIS_NAME+"_rooted.tre", treetype="non-clock")[1]
+rooted_tree <- readTrees("data/"+ANALYSIS_NAME+"_rooted.tre", treetype="clock")[1]
 
 outgroup <- clade("Diplolaemus_darwinii")
 
@@ -39,6 +39,8 @@ tree ~ dnUniformTopologyBranchLength( branchLengthDistribution=dnExp(10.0), taxa
                                       rooted=TRUE,
                                       outgroup )
 tree.setValue( rooted_tree )
+
+TL := tree.treeLength()
 
 moves.append( mvBranchLengthScale( tree, weight=n_taxa*2-1 ) )
 
@@ -49,33 +51,34 @@ moves.append( mvBranchLengthScale( tree, weight=n_taxa*2-1 ) )
 # GTR+G nucleotide substitution model #
 #######################################
 
-
-trans_rates ~ dnDirichlet( rep(1,12) )
-trans_rates.setValue( simplex(rep(1,12)) )
-
-moves.append( mvDirichletSimplex(trans_rates, weight=1) )
-moves.append( mvBetaSimplex(trans_rates, weight=1) )
+# Initialize the parameters of substitution matrix #
+# First the stationary frequencies #
+sf_hp <- v(1,1,1,1)
 
 # Create the matrix #
-Q_gen := fnFreeK(trans_rates,rescaled=TRUE, matrixExponentialMethod="eigen")
+ln_rho <- ln(0.5)
+Q_gen ~ dnQ( alpha=sf_hp, rho=ln_rho )
 
-#pi ~ dnDirichlet( rep(1,4) )
-#
-#moves.append( mvDirichletSimplex(pi, weight=1) )
-#moves.append( mvBetaSimplex(pi, weight=1) )
+moves.append( mvMPQRateMatrix( Q_gen, weight=50 ) )
+moves.append( mvReversibilityAwareBranchLengthScale( tree, Q_gen, weight=n_taxa*2-1 ) )
 
+prob_reversible := ifelse( Q_gen.isReversible(), 1.0, 0.0 )
+pi := Q_gen.getPi()
+q_rates := Q_gen.getRates()
 
 # Create a discretized gamma distribution of rate categories  #
 # the shape parameter is drawn from an uniform prior #
 alpha ~ dnUniform( 0.0, 1E6 )
 alpha.setValue( 1.0 )
 
-moves.append( mvScale(alpha, lambda=0.5,tune=true, weight=2.0) )
+moves.append( mvScale(alpha, lambda=0.5,tune=true, weight=1.0) )
 
-site_rates := fnDiscretizeGamma( alpha, alpha, 4 )
+rates := fnDiscretizeGamma( alpha, alpha, 4 )
+
+#rates <- [1.0]
 
 # Create the substitution model and clamp with our observed DNA data #
-phySeq ~ dnPhyloCTMC(tree=tree, Q=Q_gen, siteRates=site_rates, type="DNA")
+phySeq ~ dnPhyloCTMC(tree=tree, Q=Q_gen, siteRates=rates, type="DNA")
 phySeq.clamp(aln)
 
 
@@ -90,16 +93,18 @@ mymodel = model(Q_gen)
 
 # Create a vector of monitors #
 # 1. for the full model #
-monitors.append( mnModel(filename="output/"+ANALYSIS_NAME+"_free.log", printgen=10) )
+monitors.append( mnModel(filename="output/"+ANALYSIS_NAME+".log", printgen=1) )
 
 # 2. the tree #
-monitors.append( mnFile(filename="output/"+ANALYSIS_NAME+"_free.trees", printgen=10, tree) )
+monitors.append( mnFile(filename="output/"+ANALYSIS_NAME+".trees", printgen=1, tree) )
 
 # 3. and a few select parameters to be printed to the screen #
-monitors.append( mnScreen(printgen=100, alpha) )
+monitors.append( mnScreen(printgen=20, prob_reversible) )
 
 # Initialize the MCMC object #
-mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine="mixed")
+mymcmc = mcmc(mymodel, monitors, moves, nruns=4, combine="mixed")
+#mymcmc = mcmcmc(mymodel, monitors, moves, nruns=4, nchains=4, combine="mixed")
+
 
 # Run the MCMC #
 mymcmc.run(generations=50000, tuningInterval=200, underPrior=!TRUE)

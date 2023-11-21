@@ -31,7 +31,7 @@ monitors = VectorMonitors()
 # Fixed topology with exponential branch lengths #
 ##################################################
 
-rooted_tree <- readTrees("data/"+ANALYSIS_NAME+"_rooted.tre", treetype="non-clock")[1]
+rooted_tree <- readTrees("data/"+ANALYSIS_NAME+"_rooted.tre", treetype="clock")[1]
 
 outgroup <- clade("Diplolaemus_darwinii")
 
@@ -39,6 +39,8 @@ tree ~ dnUniformTopologyBranchLength( branchLengthDistribution=dnExp(10.0), taxa
                                       rooted=TRUE,
                                       outgroup )
 tree.setValue( rooted_tree )
+
+TL := tree.treeLength()
 
 moves.append( mvBranchLengthScale( tree, weight=n_taxa*2-1 ) )
 
@@ -53,17 +55,8 @@ moves.append( mvBranchLengthScale( tree, weight=n_taxa*2-1 ) )
 # Create the matrix #
 Q_gen <- fnJC(4)
 
-# Create a discretized gamma distribution of rate categories  #
-# the shape parameter is drawn from an uniform prior #
-alpha ~ dnUniform( 0.0, 1E6 )
-alpha.setValue( 1.0 )
-
-moves.append( mvScale(alpha, lambda=0.5,tune=true, weight=2.0) )
-
-rates := fnDiscretizeGamma( alpha, alpha, 4 )
-
 # Create the substitution model and clamp with our observed DNA data #
-phySeq ~ dnPhyloCTMC(tree=tree, Q=Q_gen, siteRates=rates, type="DNA")
+phySeq ~ dnPhyloCTMC(tree=tree, Q=Q_gen, type="DNA")
 phySeq.clamp(aln)
 
 
@@ -84,10 +77,10 @@ monitors.append( mnModel(filename="output/"+ANALYSIS_NAME+"_JC.log", printgen=10
 monitors.append( mnFile(filename="output/"+ANALYSIS_NAME+"_JC.trees", printgen=10, tree) )
 
 # 3. and a few select parameters to be printed to the screen #
-monitors.append( mnScreen(printgen=100, alpha) )
+monitors.append( mnScreen(printgen=100, TL) )
 
 # Initialize the MCMC object #
-mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine="mixed")
+mymcmc = mcmc(mymodel, monitors, moves, nruns=8, combine="mixed")
 
 # Run the MCMC #
 mymcmc.run(generations=50000, tuningInterval=200, underPrior=!TRUE)

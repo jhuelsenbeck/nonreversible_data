@@ -1,0 +1,28 @@
+########################################################
+#
+# RevBayes Example: Non-reversible to reversible substitution model on strict clock tree
+#
+#
+# authors: Sebastian Hoehna & John Huelsenbeck
+#
+########################################################
+
+
+trans_rates ~ dnDirichlet( rep(1,12) )
+trans_rates.setValue( simplex(rep(1,12)) )
+
+moves.append( mvDirichletSimplex(trans_rates, alpha=100, weight=1) )
+moves.append( mvBetaSimplex(trans_rates, alpha=100, weight=2) )
+
+# Create the matrix #
+Q_gen := fnFreeK(trans_rates,rescaled=TRUE, matrixExponentialMethod="eigen")
+
+
+# Create a discretized gamma distribution of rate categories  #
+# the shape parameter is drawn from an uniform prior #
+alpha ~ dnUniform( 0.0, 1E6 )
+alpha.setValue( 1.0 )
+
+moves.append( mvScale(alpha, lambda=0.5,tune=true, weight=2.0) )
+
+rates := fnDiscretizeGamma( alpha, alpha, 4 )
